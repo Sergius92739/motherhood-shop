@@ -1,0 +1,21 @@
+{
+  "name": "motherhood-shop",
+  "version": "1.0.0",
+  "description": "Современный интернет-магазин товаров для беременных с полным циклом: от каталога до доставки. Проект построен на современных технологиях с фокусом на производительность, безопасность и масштабируемость.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sergius92739/motherhood-shop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sergius92739/motherhood-shop/issues"
+  },
+  "homepage": "https://github.com/Sergius92739/motherhood-shop#readme"
+}
