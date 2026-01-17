@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: motherhood_postgres_dev
+    environment:
+      POSTGRES_DB: motherhood_shop
+      POSTGRES_USER: motherhood_user
+      POSTGRES_PASSWORD: motherhood_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: motherhood_redis_dev
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  motherhood_network:
+    driver: bridge

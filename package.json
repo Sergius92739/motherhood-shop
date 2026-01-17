@@ -15,9 +15,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:dev": "docker-compose up -d",
+    "docker:dev:down": "docker-compose down",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod:down": "docker-compose -f docker-compose.prod.yml down"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,6 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Sergius92739/motherhood-shop/issues"
   },
@@ -59,6 +59,7 @@
     "react-hot-toast": "^2.6.0",
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
+    "redis": "^5.10.0",
     "sharp": "^0.34.5",
     "swr": "^2.3.8",
     "tailwindcss": "^4.1.18",

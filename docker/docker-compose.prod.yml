@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: motherhood_postgres
+    environment:
+      POSTGRES_DB: motherhood_shop
+      POSTGRES_USER: motherhood_user
+      POSTGRES_PASSWORD: motherhood_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: motherhood_redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: motherhood_app
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://motherhood_user:motherhood_password@postgres:5432/motherhood_shop
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: motherhood_nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    networks:
+      - motherhood_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  motherhood_network:
+    driver: bridge

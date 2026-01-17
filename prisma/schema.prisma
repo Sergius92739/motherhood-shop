@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Базовый enum для статусов
+enum Status {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+// Модель пользователя
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String
+  firstName         String?
+  lastName          String?
+  phone             String?
+  
+  // Роли пользователя
+  role              UserRole  @default(CUSTOMER)
+  
+  // Статус аккаунта
+  status            Status    @default(ACTIVE)
+  
+  // Данные для беременных (специфика магазина)
+  pregnancyWeek     Int?      // Текущая неделя беременности
+  dueDate          DateTime? // Предполагаемая дата родов
+  
+  // Адреса пользователя
+  addresses        Address[]
+  
+  // Сессии
+  sessions         Session[]
+  
+  // Отзывы
+  reviews          Review[]
+  
+  // Заказы
+  orders           Order[]
+  
+  // Токены сброса пароля
+  resetTokens      ResetToken[]
+  
+  // Методы аутентификации
+  authMethod       AuthMethod @default(EMAIL)
+  emailVerified    Boolean    @default(false)
+  verificationToken String?
+  
+  // Даты
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  lastLoginAt      DateTime?
+  
+  // Индексы
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Роли пользователей
+enum UserRole {
+  CUSTOMER     // Покупатель
+  MANAGER      // Менеджер
+  ADMIN        // Администратор
+  CONTENT_MGR  // Контент-менеджер
+}
+
+// Методы аутентификации
+enum AuthMethod {
+  EMAIL
+  GOOGLE
+  VK
+  YANDEX
+}
+
+// Сессии пользователя
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Данные сессии
+  accessToken  String   @unique
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  
+  // Сроки действия
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  
+  // Индексы
+  @@index([userId])
+  @@index([accessToken])
+  @@index([refreshToken])
+  @@index([expiresAt])
+}
+
+// Токены сброса пароля
+model ResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// Адреса пользователя
+model Address {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Основные поля
+  title       String?  // Название адреса (Дом, Работа и т.д.)
+  fullName    String
+  phone       String
+  country     String   @default("Россия")
+  region      String?  // Область/край
+  city        String
+  street      String
+  building    String
+  apartment   String?
+  zipCode     String?
+  
+  // Координаты для карты
+  latitude    Float?
+  longitude   Float?
+  
+  // Основной адрес
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Связи
+  orders      Order[]  // Заказы на этот адрес
+  
+  @@index([userId])
+  @@index([isDefault])
+  @@index([city])
+}
+
+// Заготовка для будущих моделей (будем расширять)
+model Product {
+  id          String   @id @default(cuid())
+  // ... будет добавлено в спринте 2.1
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  // ... будет добавлено в спринте 2.1
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  // ... будет добавлено в спринте 4.1
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  // ... будет добавлено в спринте 3.1
+}
+
+// Индексы для производительности
+@@map("_prisma_migrations")
